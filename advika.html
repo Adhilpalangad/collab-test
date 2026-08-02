@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advika | Profile</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>%E2%9C%A8</text></svg>">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #311042 100%);
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-hover-bg: rgba(255, 255, 255, 0.07);
+            --glass-hover-border: rgba(255, 255, 255, 0.15);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-glow: rgba(99, 102, 241, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html { scrollbar-color: #8b5cf6 transparent; }
+
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(#6366f1, #d946ef);
+            border-radius: 10px;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            position: relative;
+            opacity: 0;
+            animation: bodyFadeIn 0.9s ease forwards;
+        }
+
+        @keyframes bodyFadeIn {
+            to { opacity: 1; }
+        }
+
+        /* Starfield */
+        #starfield {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .star {
+            position: absolute;
+            border-radius: 50%;
+            background: #fff;
+            animation-name: starTwinkle;
+            animation-timing-function: ease-in-out;
+            animation-iteration-count: infinite;
+        }
+
+        @keyframes starTwinkle {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+
+        /* Decorative Background Orbs (with parallax wrapper) */
+        .orb-wrap {
+            position: absolute;
+            z-index: 0;
+            pointer-events: none;
+            transition: transform 0.4s ease-out;
+        }
+
+        .orb-wrap-1 { top: 10%; left: 15%; }
+        .orb-wrap-2 { bottom: 10%; right: 15%; }
+
+        .orb {
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.55;
+        }
+
+        .orb-1 {
+            width: 300px;
+            height: 300px;
+            background: #6366f1;
+            animation: float 8s ease-in-out infinite alternate;
+        }
+
+        .orb-2 {
+            width: 400px;
+            height: 400px;
+            background: #d946ef;
+            animation: float 12s ease-in-out infinite alternate-reverse;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0) scale(1); }
+            100% { transform: translateY(20px) scale(1.05); }
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            width: 90%;
+            max-width: 800px;
+            padding: 40px 20px;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            margin-bottom: 30px;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+
+        .back-link:hover {
+            color: var(--text-primary);
+            transform: translateX(-4px);
+        }
+
+        /* Entrance animation */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 3D Tilt Profile Card */
+        .tilt-wrap {
+            perspective: 1000px;
+            margin-bottom: 40px;
+            animation: fadeInUp 0.7s ease both;
+        }
+
+        .tilt-card {
+            position: relative;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 32px;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+            transform-style: preserve-3d;
+            transition: transform 0.15s ease-out, box-shadow 0.3s ease;
+            overflow: hidden;
+        }
+
+        .tilt-card:hover {
+            box-shadow: 0 20px 60px var(--accent-glow), 0 4px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .tilt-card .glare,
+        .tilt-card .holo {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            border-radius: 20px;
+        }
+
+        .tilt-card .glare {
+            background: transparent;
+            transition: background 0.15s ease-out;
+        }
+
+        .tilt-card .holo {
+            background: linear-gradient(115deg,
+                transparent 20%,
+                rgba(99, 102, 241, 0.35) 35%,
+                rgba(217, 70, 239, 0.35) 50%,
+                rgba(96, 165, 250, 0.35) 65%,
+                transparent 80%);
+            background-size: 250% 250%;
+            background-position: 50% 50%;
+            mix-blend-mode: overlay;
+            opacity: 0;
+            transition: opacity 0.3s ease, background-position 0.15s ease-out;
+        }
+
+        .tilt-card:hover .holo {
+            opacity: 0.85;
+        }
+
+        /* Profile Header */
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 28px;
+            flex-wrap: wrap;
+            position: relative;
+        }
+
+        /* Elegant anime portrait */
+        .portrait-wrap {
+            position: relative;
+            flex-shrink: 0;
+            width: 170px;
+            height: 200px;
+            animation: portraitFloat 5s ease-in-out infinite;
+        }
+
+        @keyframes portraitFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .portrait-wrap svg {
+            width: 100%;
+            height: 100%;
+            overflow: visible;
+        }
+
+        .hair-strand {
+            transform-box: fill-box;
+            transform-origin: top center;
+            animation: hairSway 3s ease-in-out infinite alternate;
+        }
+
+        .hair-strand.right { animation-delay: 0.4s; }
+
+        @keyframes hairSway {
+            0% { transform: rotate(-3deg); }
+            100% { transform: rotate(3deg); }
+        }
+
+        .eye-blink {
+            transform-box: fill-box;
+            transform-origin: center;
+            animation: portraitBlink 5.5s ease-in-out infinite;
+        }
+
+        @keyframes portraitBlink {
+            0%, 92%, 100% { transform: scaleY(1); }
+            96% { transform: scaleY(0.1); }
+        }
+
+        .sparkle {
+            position: absolute;
+            color: #fef08a;
+            font-size: 1rem;
+            animation: twinkle 2.2s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        .sparkle.s1 { top: 4px; right: -6px; animation-delay: 0s; }
+        .sparkle.s2 { bottom: 30px; left: -14px; font-size: 0.7rem; animation-delay: 0.7s; }
+        .sparkle.s3 { top: 46px; right: -18px; font-size: 0.8rem; animation-delay: 1.4s; }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0; transform: scale(0.4) rotate(0deg); }
+            50% { opacity: 1; transform: scale(1.1) rotate(20deg); }
+        }
+
+        .quick-facts {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .chip {
+            font-size: 0.75rem;
+            padding: 4px 12px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-secondary);
+        }
+
+        h1 {
+            font-size: 2.4rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 6px;
+            background: linear-gradient(90deg, #ffffff, #c084fc, #6366f1, #c084fc, #ffffff);
+            background-size: 250% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 5s linear infinite;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% center; }
+            100% { background-position: 250% center; }
+        }
+
+        .tagline {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            font-weight: 300;
+            min-height: 1.4em;
+        }
+
+        .tagline .cursor {
+            display: inline-block;
+            width: 2px;
+            height: 1em;
+            background: #c084fc;
+            margin-left: 2px;
+            vertical-align: -2px;
+            animation: caretBlink 0.9s steps(1) infinite;
+        }
+
+        @keyframes caretBlink {
+            0%, 50% { opacity: 1; }
+            50.01%, 100% { opacity: 0; }
+        }
+
+        /* Card */
+        .card {
+            position: relative;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 28px 30px;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+            margin-bottom: 24px;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            animation: fadeInUp 0.7s ease both;
+            overflow: hidden;
+        }
+
+        .card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -150%;
+            width: 60%;
+            height: 100%;
+            background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.12), transparent);
+            transform: skewX(-20deg);
+            transition: left 0.75s ease;
+            pointer-events: none;
+        }
+
+        .card:hover::after {
+            left: 150%;
+        }
+
+        .card:nth-of-type(1) { animation-delay: 0.1s; }
+        .card:nth-of-type(2) { animation-delay: 0.2s; }
+        .card:nth-of-type(3) { animation-delay: 0.3s; }
+
+        .card:hover {
+            background: var(--glass-hover-bg);
+            border-color: var(--glass-hover-border);
+            transform: translateY(-4px);
+            box-shadow: 0 14px 40px var(--accent-glow);
+        }
+
+        .card h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 14px;
+            color: #c084fc;
+            letter-spacing: -0.01em;
+        }
+
+        .card p {
+            color: var(--text-secondary);
+            font-weight: 300;
+            line-height: 1.7;
+        }
+
+        /* Skills */
+        .skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .skill-badge {
+            font-size: 0.85rem;
+            padding: 6px 14px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            color: var(--text-secondary);
+            font-weight: 400;
+            transition: all 0.3s ease;
+        }
+
+        .skill-badge:hover {
+            background: rgba(99, 102, 241, 0.25);
+            color: #a5b4fc;
+            border-color: rgba(99, 102, 241, 0.4);
+            transform: translateY(-3px) scale(1.06);
+            box-shadow: 0 6px 16px rgba(99, 102, 241, 0.35);
+        }
+
+        /* Links */
+        .links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+        }
+
+        .link-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 400;
+            transition: all 0.3s ease;
+        }
+
+        .link-btn:hover {
+            background: rgba(99, 102, 241, 0.25);
+            border-color: rgba(99, 102, 241, 0.4);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.35);
+        }
+
+        footer {
+            margin-top: 40px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            opacity: 0.7;
+            text-align: center;
+        }
+
+        /* Floating anime mascot */
+        .mascot-wrap {
+            position: fixed;
+            bottom: 10px;
+            right: 16px;
+            width: 130px;
+            z-index: 50;
+            pointer-events: none;
+        }
+
+        .mascot {
+            width: 100%;
+            display: block;
+            animation: mascotFloat 4s ease-in-out infinite;
+            filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.35));
+        }
+
+        @keyframes mascotFloat {
+            0%, 100% { transform: translateY(0) rotate(-1deg); }
+            50% { transform: translateY(-16px) rotate(1deg); }
+        }
+
+        .mascot-heart {
+            position: absolute;
+            top: 6px;
+            right: 34px;
+            font-size: 1.2rem;
+            opacity: 0;
+            animation: heartPop 3.4s ease-in-out infinite;
+        }
+
+        @keyframes heartPop {
+            0%, 55%, 100% { opacity: 0; transform: translateY(0) scale(0.5); }
+            72% { opacity: 1; transform: translateY(-18px) scale(1); }
+            90% { opacity: 0; transform: translateY(-38px) scale(0.8); }
+        }
+
+        .mascot-eyes {
+            transform-box: fill-box;
+            transform-origin: center;
+            animation: blink 4.5s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+            0%, 90%, 100% { transform: scaleY(1); }
+            95% { transform: scaleY(0.1); }
+        }
+
+        .mascot-arm {
+            transform-box: fill-box;
+            transform-origin: top center;
+            animation: wave 1.8s ease-in-out infinite;
+        }
+
+        @keyframes wave {
+            0%, 100% { transform: rotate(-8deg); }
+            50% { transform: rotate(18deg); }
+        }
+
+        /* Cursor sparkle trail */
+        .cursor-sparkle {
+            position: fixed;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 9999;
+            font-size: 14px;
+            animation: sparkleFade 0.85s ease-out forwards;
+        }
+
+        @keyframes sparkleFade {
+            0% { opacity: 1; transform: translate(0, 0) scale(1) rotate(0deg); }
+            100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(0.2) rotate(180deg); }
+        }
+
+        @media (max-width: 600px) {
+            .mascot-wrap { width: 90px; }
+        }
+    </style>
+</head>
+<body>
+    <div id="starfield"></div>
+
+    <div class="orb-wrap orb-wrap-1" id="orbWrap1"><div class="orb orb-1"></div></div>
+    <div class="orb-wrap orb-wrap-2" id="orbWrap2"><div class="orb orb-2"></div></div>
+
+    <div class="container">
+        <a href="index.html" class="back-link">&larr; Back to Dashboard</a>
+
+        <div class="tilt-wrap">
+            <div class="tilt-card" id="tiltCard">
+                <div class="profile-header">
+                    <div class="portrait-wrap">
+                        <svg viewBox="0 0 280 340" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <radialGradient id="halo" cx="50%" cy="32%" r="65%">
+                                    <stop offset="0%" stop-color="#c084fc" stop-opacity="0.4"/>
+                                    <stop offset="100%" stop-color="#c084fc" stop-opacity="0"/>
+                                </radialGradient>
+                                <linearGradient id="hairBack" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#4c2f8c"/>
+                                    <stop offset="50%" stop-color="#7c5cff"/>
+                                    <stop offset="100%" stop-color="#b9a6ff"/>
+                                </linearGradient>
+                                <linearGradient id="hairFront" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" stop-color="#a78bff"/>
+                                    <stop offset="100%" stop-color="#d8c9ff"/>
+                                </linearGradient>
+                                <linearGradient id="skin" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" stop-color="#ffefe0"/>
+                                    <stop offset="100%" stop-color="#ffdcc0"/>
+                                </linearGradient>
+                                <linearGradient id="dress" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#6366f1"/>
+                                    <stop offset="100%" stop-color="#c084fc"/>
+                                </linearGradient>
+                                <radialGradient id="eyeIris" cx="50%" cy="40%" r="60%">
+                                    <stop offset="0%" stop-color="#c4b5fd"/>
+                                    <stop offset="65%" stop-color="#7c5cff"/>
+                                    <stop offset="100%" stop-color="#2a1a4a"/>
+                                </radialGradient>
+                            </defs>
+
+                            <circle cx="140" cy="150" r="150" fill="url(#halo)"/>
+
+                            <!-- back hair -->
+                            <path d="M70,112 C58,58 98,18 140,18 C182,18 222,58 210,112
+                                     C228,150 236,224 220,300 C210,322 188,332 172,300
+                                     C167,258 170,196 160,150 L120,150
+                                     C110,196 113,258 108,300 C92,332 70,322 60,300
+                                     C44,224 52,150 70,112 Z" fill="url(#hairBack)"/>
+
+                            <!-- shoulders / dress -->
+                            <path d="M68,298 Q140,266 212,298 L228,340 L52,340 Z" fill="url(#dress)"/>
+                            <path d="M100,290 Q140,278 180,290 L184,306 Q140,296 96,306 Z" fill="#ffffff" opacity="0.15"/>
+
+                            <!-- neck -->
+                            <rect x="124" y="196" width="32" height="34" rx="12" fill="url(#skin)"/>
+
+                            <!-- face -->
+                            <ellipse cx="140" cy="166" rx="58" ry="64" fill="url(#skin)"/>
+
+                            <!-- face-framing side locks -->
+                            <path class="hair-strand left" d="M84,120 Q66,190 76,262 Q94,272 100,252 Q88,190 100,124 Z" fill="url(#hairFront)"/>
+                            <path class="hair-strand right" d="M196,120 Q214,190 204,262 Q186,272 180,252 Q192,190 180,124 Z" fill="url(#hairFront)"/>
+
+                            <!-- bangs -->
+                            <path d="M84,126 Q88,84 140,78 Q192,84 196,126 Q166,100 140,102 Q114,100 84,126 Z" fill="url(#hairFront)"/>
+
+                            <!-- eyebrows -->
+                            <path d="M110,148 Q121,141 133,147" stroke="#7a5fc4" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+                            <path d="M147,147 Q159,141 170,148" stroke="#7a5fc4" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+
+                            <!-- eyes -->
+                            <g class="eye-blink">
+                                <path d="M103,169 Q122,151 141,169 Q122,185 103,169 Z" fill="#fff"/>
+                                <circle cx="122" cy="169" r="10.5" fill="url(#eyeIris)"/>
+                                <circle cx="122" cy="169" r="4.2" fill="#1a1030"/>
+                                <circle cx="118" cy="164" r="2.6" fill="#fff"/>
+                                <circle cx="127" cy="173" r="1.3" fill="#fff" opacity="0.85"/>
+                                <path d="M103,169 Q122,149 141,169" stroke="#3b2266" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+                            </g>
+                            <g class="eye-blink">
+                                <path d="M139,169 Q158,151 177,169 Q158,185 139,169 Z" fill="#fff"/>
+                                <circle cx="158" cy="169" r="10.5" fill="url(#eyeIris)"/>
+                                <circle cx="158" cy="169" r="4.2" fill="#1a1030"/>
+                                <circle cx="154" cy="164" r="2.6" fill="#fff"/>
+                                <circle cx="163" cy="173" r="1.3" fill="#fff" opacity="0.85"/>
+                                <path d="M139,169 Q158,149 177,169" stroke="#3b2266" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+                            </g>
+
+                            <!-- blush -->
+                            <ellipse cx="100" cy="196" rx="14" ry="7" fill="#ffb3c6" opacity="0.55"/>
+                            <ellipse cx="180" cy="196" rx="14" ry="7" fill="#ffb3c6" opacity="0.55"/>
+
+                            <!-- lips -->
+                            <path d="M130,215 Q140,221 150,215 Q140,220.5 130,215 Z" fill="#c97a94"/>
+
+                            <!-- hair clip flower -->
+                            <g>
+                                <circle cx="196" cy="112" r="5" fill="#f472b6"/>
+                                <circle cx="204" cy="108" r="5" fill="#f472b6"/>
+                                <circle cx="204" cy="118" r="5" fill="#f472b6"/>
+                                <circle cx="190" cy="118" r="5" fill="#f472b6"/>
+                                <circle cx="198" cy="113" r="3.4" fill="#fde68a"/>
+                            </g>
+                        </svg>
+                        <span class="sparkle s1">&#10022;</span>
+                        <span class="sparkle s2">&#10022;</span>
+                        <span class="sparkle s3">&#10022;</span>
+                    </div>
+                    <div>
+                        <h1>Advika</h1>
+                        <p class="tagline"><span id="taglineText"></span><span class="cursor"></span></p>
+                        <div class="quick-facts">
+                            <span class="chip">&#127891; Engineering Student</span>
+                            <span class="chip">&#127793; Learning Git</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="glare" id="glare"></div>
+                <div class="holo" id="holo"></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>About</h2>
+            <p>
+                Hey, Advika here!! I'm an engineering student who's just as happy sketching out
+                an idea as debugging one. This page is my little corner of the team's Git
+                collaboration project &mdash; a hands-on way to get comfortable with branching,
+                committing, and pushing changes, one commit at a time. Always up for learning
+                something new (and making it look a little pretty while I'm at it).
+            </p>
+        </div>
+
+        <div class="card">
+            <h2>Skills &amp; Tech Stack</h2>
+            <div class="skills">
+                <span class="skill-badge">HTML</span>
+                <span class="skill-badge">CSS</span>
+                <span class="skill-badge">JavaScript</span>
+                <span class="skill-badge">Git &amp; GitHub</span>
+                <span class="skill-badge">Python</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Connect</h2>
+            <div class="links">
+                <a href="mailto:advikaak12@gmail.com" class="link-btn">Email</a>
+                <a href="https://github.com/" class="link-btn" target="_blank" rel="noopener noreferrer">GitHub</a>
+                <a href="https://linkedin.com/" class="link-btn" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+            </div>
+        </div>
+
+        <footer>
+            <p>Git Collaboration Study Project &bull; Advika's Workspace</p>
+        </footer>
+    </div>
+
+    <!-- Floating anime mascot -->
+    <div class="mascot-wrap">
+        <span class="mascot-heart">&#128156;</span>
+        <svg class="mascot" viewBox="0 0 140 200" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="70" cy="192" rx="35" ry="6" fill="rgba(0,0,0,0.25)"/>
+            <rect x="55" y="150" width="12" height="35" rx="6" fill="#3b2266"/>
+            <rect x="75" y="150" width="12" height="35" rx="6" fill="#3b2266"/>
+            <ellipse cx="61" cy="187" rx="10" ry="6" fill="#2a1a4a"/>
+            <ellipse cx="81" cy="187" rx="10" ry="6" fill="#2a1a4a"/>
+            <path d="M40 110 Q70 95 100 110 L110 155 Q70 168 30 155 Z" fill="#6366f1"/>
+            <path d="M40 110 Q70 95 100 110 L104 122 Q70 108 36 122 Z" fill="#818cf8"/>
+            <ellipse cx="35" cy="125" rx="8" ry="20" fill="#ffe0c7" transform="rotate(15 35 125)"/>
+            <g class="mascot-arm">
+                <ellipse cx="100" cy="112" rx="8" ry="22" fill="#ffe0c7" transform="rotate(-40 100 112)"/>
+            </g>
+            <ellipse cx="70" cy="60" rx="44" ry="42" fill="#7c5cff"/>
+            <ellipse cx="18" cy="80" rx="10" ry="30" fill="#7c5cff" transform="rotate(-15 18 80)"/>
+            <ellipse cx="122" cy="80" rx="10" ry="30" fill="#7c5cff" transform="rotate(15 122 80)"/>
+            <ellipse cx="70" cy="62" rx="34" ry="35" fill="#ffe0c7"/>
+            <path d="M32 55 Q38 20 70 20 Q102 20 108 55 Q90 35 70 37 Q50 35 32 55 Z" fill="#9b7bff"/>
+            <g class="mascot-eyes">
+                <ellipse cx="57" cy="64" rx="7" ry="9" fill="#3b2266"/>
+                <ellipse cx="83" cy="64" rx="7" ry="9" fill="#3b2266"/>
+                <circle cx="59" cy="61" r="2.2" fill="#fff"/>
+                <circle cx="85" cy="61" r="2.2" fill="#fff"/>
+            </g>
+            <ellipse cx="50" cy="76" rx="7" ry="3.5" fill="#ffb3c6" opacity="0.7"/>
+            <ellipse cx="90" cy="76" rx="7" ry="3.5" fill="#ffb3c6" opacity="0.7"/>
+            <path d="M64 84 Q70 88 76 84" stroke="#a8598a" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+            <circle cx="18" cy="55" r="5" fill="#ff6fa5"/>
+            <circle cx="122" cy="55" r="5" fill="#ff6fa5"/>
+        </svg>
+    </div>
+
+    <script>
+        (function () {
+            // Starfield generation
+            var field = document.getElementById('starfield');
+            var starCount = 70;
+            var frag = document.createDocumentFragment();
+            for (var i = 0; i < starCount; i++) {
+                var s = document.createElement('div');
+                s.className = 'star';
+                var size = (Math.random() * 2 + 1).toFixed(1);
+                s.style.width = size + 'px';
+                s.style.height = size + 'px';
+                s.style.top = (Math.random() * 100) + '%';
+                s.style.left = (Math.random() * 100) + '%';
+                s.style.animationDuration = (Math.random() * 3 + 2).toFixed(2) + 's';
+                s.style.animationDelay = (Math.random() * 4).toFixed(2) + 's';
+                frag.appendChild(s);
+            }
+            field.appendChild(frag);
+
+            // 3D tilt + holographic sheen
+            var card = document.getElementById('tiltCard');
+            var glare = document.getElementById('glare');
+            var holo = document.getElementById('holo');
+            var maxTilt = 10;
+
+            card.addEventListener('mousemove', function (e) {
+                var rect = card.getBoundingClientRect();
+                var x = e.clientX - rect.left;
+                var y = e.clientY - rect.top;
+                var cx = rect.width / 2;
+                var cy = rect.height / 2;
+                var rotateY = ((x - cx) / cx) * maxTilt;
+                var rotateX = -((y - cy) / cy) * maxTilt;
+                var px = (x / rect.width) * 100;
+                var py = (y / rect.height) * 100;
+
+                card.style.transform =
+                    'perspective(900px) rotateX(' + rotateX + 'deg) rotateY(' + rotateY + 'deg) scale3d(1.02, 1.02, 1.02)';
+                glare.style.background =
+                    'radial-gradient(circle at ' + x + 'px ' + y + 'px, rgba(255,255,255,0.22), transparent 60%)';
+                holo.style.backgroundPosition = px + '% ' + py + '%';
+            });
+
+            card.addEventListener('mouseleave', function () {
+                card.style.transform = 'perspective(900px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+                glare.style.background = 'transparent';
+            });
+
+            // Orb parallax
+            var orbWrap1 = document.getElementById('orbWrap1');
+            var orbWrap2 = document.getElementById('orbWrap2');
+            document.addEventListener('mousemove', function (e) {
+                var nx = (e.clientX / window.innerWidth) - 0.5;
+                var ny = (e.clientY / window.innerHeight) - 0.5;
+                orbWrap1.style.transform = 'translate(' + (nx * 30) + 'px,' + (ny * 30) + 'px)';
+                orbWrap2.style.transform = 'translate(' + (nx * -40) + 'px,' + (ny * -40) + 'px)';
+            });
+
+            // Cursor sparkle trail (throttled)
+            var lastSparkle = 0;
+            var sparkleChars = ['✦', '✧', '✹', '⋆'];
+            var sparkleColors = ['#c084fc', '#818cf8', '#f472b6', '#facc15'];
+            document.addEventListener('mousemove', function (e) {
+                var now = Date.now();
+                if (now - lastSparkle < 70) return;
+                lastSparkle = now;
+
+                var el = document.createElement('span');
+                el.className = 'cursor-sparkle';
+                el.textContent = sparkleChars[Math.floor(Math.random() * sparkleChars.length)];
+                el.style.color = sparkleColors[Math.floor(Math.random() * sparkleColors.length)];
+                el.style.left = e.clientX + 'px';
+                el.style.top = e.clientY + 'px';
+                var dx = (Math.random() * 40 - 20).toFixed(0) + 'px';
+                var dy = (Math.random() * -30 - 10).toFixed(0) + 'px';
+                el.style.setProperty('--dx', dx);
+                el.style.setProperty('--dy', dy);
+                document.body.appendChild(el);
+                setTimeout(function () { el.remove(); }, 900);
+            });
+
+            // Typing effect for tagline
+            var taglineEl = document.getElementById('taglineText');
+            var fullText = 'Hey, Advika here!!';
+            var idx = 0;
+            function typeNext() {
+                if (idx <= fullText.length) {
+                    taglineEl.textContent = fullText.slice(0, idx);
+                    idx++;
+                    setTimeout(typeNext, 65);
+                }
+            }
+            setTimeout(typeNext, 600);
+        })();
+    </script>
+</body>
+</html>
