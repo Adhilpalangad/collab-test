@@ -1,0 +1,1250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fathima | Live Requirement Updation Pie Chart</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- FontAwesome icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-dark: #090d16;
+            --bg-card: rgba(17, 24, 39, 0.7);
+            --bg-card-hover: rgba(31, 41, 55, 0.8);
+            --border-glass: rgba(255, 255, 255, 0.08);
+            --border-highlight: rgba(139, 92, 246, 0.3);
+            
+            --text-primary: #f9fafb;
+            --text-secondary: #9ca3af;
+            --text-muted: #6b7280;
+
+            /* Requirement Status Colors */
+            --color-completed: #10b981;
+            --color-in-progress: #3b82f6;
+            --color-pending: #f59e0b;
+            --color-deferred: #ef4444;
+
+            --color-completed-glow: rgba(16, 185, 129, 0.25);
+            --color-in-progress-glow: rgba(59, 130, 246, 0.25);
+            --color-pending-glow: rgba(245, 158, 11, 0.25);
+            --color-deferred-glow: rgba(239, 68, 68, 0.25);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(217, 70, 239, 0.12) 0px, transparent 50%),
+                radial-gradient(at 50% 100%, rgba(16, 185, 129, 0.1) 0px, transparent 50%);
+            background-attachment: fixed;
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 24px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Ambient glowing orbs */
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(100px);
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.4;
+        }
+        .orb-1 { width: 400px; height: 400px; background: #6366f1; top: -100px; left: -100px; }
+        .orb-2 { width: 500px; height: 500px; background: #ec4899; bottom: -150px; right: -150px; }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-glass);
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .header-title-group h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffffff 0%, #c084fc 50%, #818cf8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-title-group p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-top: 4px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-glass);
+            color: var(--text-primary);
+            padding: 10px 18px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-back:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateX(-3px);
+        }
+
+        /* Live Indicator Badge */
+        .live-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 20px;
+            color: #34d399;
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #10b981;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #10b981;
+            animation: pulse 1.8s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { transform: scale(1.2); box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        /* Stat Grid */
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-glass);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: transparent;
+            transition: background 0.3s ease;
+        }
+
+        .stat-card.total::before { background: linear-gradient(90deg, #818cf8, #c084fc); }
+        .stat-card.completed::before { background: var(--color-completed); }
+        .stat-card.in-progress::before { background: var(--color-in-progress); }
+        .stat-card.pending::before { background: var(--color-pending); }
+        .stat-card.deferred::before { background: var(--color-deferred); }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .stat-info .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
+
+        .stat-info .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            line-height: 1;
+            letter-spacing: -0.02em;
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-glass);
+        }
+
+        .total .stat-icon { color: #c084fc; }
+        .completed .stat-icon { color: var(--color-completed); background: var(--color-completed-glow); }
+        .in-progress .stat-icon { color: var(--color-in-progress); background: var(--color-in-progress-glow); }
+        .pending .stat-icon { color: var(--color-pending); background: var(--color-pending-glow); }
+        .deferred .stat-icon { color: var(--color-deferred); background: var(--color-deferred-glow); }
+
+        /* Main Content Grid */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 28px;
+        }
+
+        @media (max-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Glass Panel */
+        .glass-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border-glass);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid var(--border-glass);
+        }
+
+        .panel-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-primary);
+        }
+
+        .panel-title i {
+            color: #c084fc;
+        }
+
+        /* Pie Chart Container */
+        .chart-container {
+            position: relative;
+            height: 320px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 10px 0 20px 0;
+        }
+
+        /* Custom Legend Items */
+        .legend-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 14px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-glass);
+            border-radius: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .legend-item:hover {
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .legend-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .legend-color-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .legend-name {
+            font-size: 0.88rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .legend-badge {
+            font-size: 0.85rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--text-primary);
+        }
+
+        /* Live Control Buttons */
+        .controls-bar {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 16px;
+            border-radius: 12px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.6);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--text-primary);
+            border: 1px solid var(--border-glass);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-simulate {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-simulate:hover {
+            background: rgba(16, 185, 129, 0.25);
+        }
+
+        .btn-simulate.active {
+            background: rgba(16, 185, 129, 0.9);
+            color: #042f2e;
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.5);
+        }
+
+        /* Form Inputs */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 11px 14px;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--border-glass);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .form-input:focus, .form-select:focus {
+            border-color: #818cf8;
+            box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.2);
+            background: rgba(15, 23, 42, 0.8);
+        }
+
+        .form-select option {
+            background: #111827;
+            color: var(--text-primary);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        /* Filter Tabs */
+        .filter-tabs {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 16px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+        }
+
+        .filter-tab {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-glass);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .filter-tab:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .filter-tab.active {
+            background: #6366f1;
+            color: white;
+            border-color: #6366f1;
+        }
+
+        /* Requirement List Cards */
+        .req-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 480px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .req-list::-webkit-scrollbar {
+            width: 6px;
+        }
+        .req-list::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 10px;
+        }
+        .req-list::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+        }
+
+        .req-card {
+            background: rgba(255, 255, 255, 0.025);
+            border: 1px solid var(--border-glass);
+            border-radius: 14px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            transition: all 0.25s ease;
+        }
+
+        .req-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.12);
+            transform: translateX(2px);
+        }
+
+        .req-details {
+            flex: 1;
+        }
+
+        .req-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .req-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+        }
+
+        .tag {
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .tag-category {
+            background: rgba(147, 51, 234, 0.15);
+            color: #d8b4fe;
+            border: 1px solid rgba(147, 51, 234, 0.3);
+        }
+
+        .tag-priority-high {
+            background: rgba(239, 68, 68, 0.15);
+            color: #fca5a5;
+        }
+
+        .tag-priority-medium {
+            background: rgba(245, 158, 11, 0.15);
+            color: #fde047;
+        }
+
+        .tag-priority-low {
+            background: rgba(59, 130, 246, 0.15);
+            color: #93c5fd;
+        }
+
+        /* Status Select Dropdown inside Card */
+        .status-select {
+            padding: 6px 12px;
+            border-radius: 10px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            border: 1px solid transparent;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .status-select.completed {
+            background: var(--color-completed-glow);
+            color: var(--color-completed);
+            border-color: rgba(16, 185, 129, 0.4);
+        }
+
+        .status-select.in-progress {
+            background: var(--color-in-progress-glow);
+            color: var(--color-in-progress);
+            border-color: rgba(59, 130, 246, 0.4);
+        }
+
+        .status-select.pending {
+            background: var(--color-pending-glow);
+            color: var(--color-pending);
+            border-color: rgba(245, 158, 11, 0.4);
+        }
+
+        .status-select.deferred {
+            background: var(--color-deferred-glow);
+            color: var(--color-deferred);
+            border-color: rgba(239, 68, 68, 0.4);
+        }
+
+        .btn-icon-delete {
+            background: rgba(239, 68, 68, 0.1);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-icon-delete:hover {
+            background: rgba(239, 68, 68, 0.25);
+            color: #ef4444;
+            transform: scale(1.05);
+        }
+
+        /* Toast notification */
+        #toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            background: #1f2937;
+            border: 1px solid var(--border-highlight);
+            color: var(--text-primary);
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 0.88rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
+        }
+        .empty-state i {
+            font-size: 2.5rem;
+            margin-bottom: 12px;
+            opacity: 0.4;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="header-title-group">
+                <h1><i class="fa-solid fa-chart-pie"></i> Fathima's Requirement Tracker</h1>
+                <p>Real-Time Requirement Updation & Dynamic Live Analytics</p>
+            </div>
+            <div class="header-actions">
+                <div class="live-badge">
+                    <div class="live-dot"></div>
+                    Live Syncing
+                </div>
+                <a href="index.html" class="btn-back">
+                    <i class="fa-solid fa-arrow-left"></i> Team Dashboard
+                </a>
+            </div>
+        </header>
+
+        <!-- Stat Summary Cards -->
+        <div class="stat-grid">
+            <div class="stat-card total">
+                <div class="stat-info">
+                    <div class="stat-label">Total Requirements</div>
+                    <div class="stat-value" id="stat-total">0</div>
+                </div>
+                <div class="stat-icon">
+                    <i class="fa-solid fa-list-check"></i>
+                </div>
+            </div>
+
+            <div class="stat-card completed">
+                <div class="stat-info">
+                    <div class="stat-label">Completed</div>
+                    <div class="stat-value" id="stat-completed" style="color: var(--color-completed);">0</div>
+                </div>
+                <div class="stat-icon">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+            </div>
+
+            <div class="stat-card in-progress">
+                <div class="stat-info">
+                    <div class="stat-label">In Progress</div>
+                    <div class="stat-value" id="stat-in-progress" style="color: var(--color-in-progress);">0</div>
+                </div>
+                <div class="stat-icon">
+                    <i class="fa-solid fa-spinner"></i>
+                </div>
+            </div>
+
+            <div class="stat-card pending">
+                <div class="stat-info">
+                    <div class="stat-label">Pending</div>
+                    <div class="stat-value" id="stat-pending" style="color: var(--color-pending);">0</div>
+                </div>
+                <div class="stat-icon">
+                    <i class="fa-solid fa-clock"></i>
+                </div>
+            </div>
+
+            <div class="stat-card deferred">
+                <div class="stat-info">
+                    <div class="stat-label">Deferred / Blocked</div>
+                    <div class="stat-value" id="stat-deferred" style="color: var(--color-deferred);">0</div>
+                </div>
+                <div class="stat-icon">
+                    <i class="fa-solid fa-ban"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Workspace Layout -->
+        <div class="main-grid">
+            
+            <!-- Left Side: Live Pie Chart Panel -->
+            <div class="glass-panel">
+                <div class="panel-header">
+                    <div class="panel-title">
+                        <i class="fa-solid fa-chart-donut"></i> Live Requirement Distribution
+                    </div>
+                    <span id="chart-total-badge" style="font-size: 0.8rem; background: rgba(255,255,255,0.06); padding: 4px 10px; border-radius: 12px; color: var(--text-secondary);">
+                        0 Items
+                    </span>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="requirementPieChart"></canvas>
+                </div>
+
+                <!-- Custom Interactive Legend Breakdown -->
+                <div class="legend-grid">
+                    <div class="legend-item">
+                        <div class="legend-left">
+                            <div class="legend-color-dot" style="background: var(--color-completed);"></div>
+                            <span class="legend-name">Completed</span>
+                        </div>
+                        <span class="legend-badge" id="legend-pct-completed">0%</span>
+                    </div>
+
+                    <div class="legend-item">
+                        <div class="legend-left">
+                            <div class="legend-color-dot" style="background: var(--color-in-progress);"></div>
+                            <span class="legend-name">In Progress</span>
+                        </div>
+                        <span class="legend-badge" id="legend-pct-in-progress">0%</span>
+                    </div>
+
+                    <div class="legend-item">
+                        <div class="legend-left">
+                            <div class="legend-color-dot" style="background: var(--color-pending);"></div>
+                            <span class="legend-name">Pending</span>
+                        </div>
+                        <span class="legend-badge" id="legend-pct-pending">0%</span>
+                    </div>
+
+                    <div class="legend-item">
+                        <div class="legend-left">
+                            <div class="legend-color-dot" style="background: var(--color-deferred);"></div>
+                            <span class="legend-name">Deferred</span>
+                        </div>
+                        <span class="legend-badge" id="legend-pct-deferred">0%</span>
+                    </div>
+                </div>
+
+                <!-- Live Control Buttons -->
+                <div class="controls-bar">
+                    <button class="btn btn-simulate" id="btn-toggle-simulation" onclick="toggleSimulation()">
+                        <i class="fa-solid fa-play"></i> Auto Simulate Live Updates
+                    </button>
+                    <button class="btn btn-secondary" onclick="resetToSampleData()">
+                        <i class="fa-solid fa-rotate"></i> Reset Samples
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right Side: Requirements Management & Form -->
+            <div class="glass-panel">
+                <div class="panel-header">
+                    <div class="panel-title">
+                        <i class="fa-solid fa-sliders"></i> Requirements & Live Status
+                    </div>
+                    <button class="btn btn-primary" style="padding: 6px 14px; font-size: 0.82rem;" onclick="toggleAddForm()">
+                        <i class="fa-solid fa-plus"></i> New Requirement
+                    </button>
+                </div>
+
+                <!-- Add Requirement Form (Collapsible/Toggle) -->
+                <div id="add-form-container" style="display: none; margin-bottom: 20px; padding: 16px; background: rgba(0,0,0,0.25); border: 1px solid var(--border-glass); border-radius: 14px;">
+                    <h4 style="font-size: 0.95rem; margin-bottom: 12px; color: #c084fc;">
+                        <i class="fa-solid fa-plus-circle"></i> Add New Live Requirement
+                    </h4>
+                    <form id="requirementForm" onsubmit="handleAddRequirement(event)">
+                        <div class="form-group">
+                            <label class="form-label">Requirement Title</label>
+                            <input type="text" id="reqTitle" class="form-input" placeholder="e.g. Implement OAuth2 Login Integration" required>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Category</label>
+                                <select id="reqCategory" class="form-select">
+                                    <option value="Frontend">Frontend</option>
+                                    <option value="Backend">Backend</option>
+                                    <option value="Database">Database</option>
+                                    <option value="UI/UX Design">UI/UX Design</option>
+                                    <option value="DevOps">DevOps</option>
+                                    <option value="QA & Testing">QA & Testing</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Priority</label>
+                                <select id="reqPriority" class="form-select">
+                                    <option value="High">High Priority</option>
+                                    <option value="Medium" selected>Medium Priority</option>
+                                    <option value="Low">Low Priority</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Initial Status</label>
+                            <select id="reqStatus" class="form-select">
+                                <option value="Pending">Pending</option>
+                                <option value="In Progress" selected>In Progress</option>
+                                <option value="Completed">Completed</option>
+                                <option value="Deferred">Deferred</option>
+                            </select>
+                        </div>
+                        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px;">
+                            <button type="button" class="btn btn-secondary" style="padding: 8px 14px; font-size: 0.85rem;" onclick="toggleAddForm()">Cancel</button>
+                            <button type="submit" class="btn btn-primary" style="padding: 8px 16px; font-size: 0.85rem;">Add & Update Chart</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Filter & Search Controls -->
+                <div class="filter-tabs">
+                    <button class="filter-tab active" onclick="setFilter('all', this)">All Requirements</button>
+                    <button class="filter-tab" onclick="setFilter('Completed', this)">Completed</button>
+                    <button class="filter-tab" onclick="setFilter('In Progress', this)">In Progress</button>
+                    <button class="filter-tab" onclick="setFilter('Pending', this)">Pending</button>
+                    <button class="filter-tab" onclick="setFilter('Deferred', this)">Deferred</button>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 16px;">
+                    <input type="text" id="searchInput" class="form-input" placeholder="🔍 Search requirements..." oninput="renderRequirementsList()">
+                </div>
+
+                <!-- Requirement List -->
+                <div class="req-list" id="requirementsList">
+                    <!-- Cards dynamically rendered here -->
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Toast Notifications Container -->
+    <div id="toast-container"></div>
+
+    <script>
+        // Initial Requirements Seed Data
+        const initialRequirements = [
+            { id: 1, title: "Design Responsive Glassmorphism Navigation Bar", category: "UI/UX Design", priority: "High", status: "Completed" },
+            { id: 2, title: "Connect Real-Time Websockets for Live Chart Updates", category: "Backend", priority: "High", status: "In Progress" },
+            { id: 3, title: "Setup Database Schema for Project Milestones", category: "Database", priority: "Medium", status: "Completed" },
+            { id: 4, title: "Implement Interactive Pie Chart Canvas Engine", category: "Frontend", priority: "High", status: "Completed" },
+            { id: 5, title: "Configure Docker CI/CD Pipeline Automation", category: "DevOps", priority: "Medium", status: "In Progress" },
+            { id: 6, title: "Write Automated End-to-End Cypress Tests", category: "QA & Testing", priority: "Low", status: "Pending" },
+            { id: 7, title: "Add Micro-animations and Smooth Gradient Orbs", category: "Frontend", priority: "Medium", status: "Completed" },
+            { id: 8, title: "Integrate Legacy API Fallback Endpoints", category: "Backend", priority: "Low", status: "Deferred" },
+            { id: 9, title: "Optimize Lighthouse Performance Score > 95", category: "Frontend", priority: "High", status: "Pending" }
+        ];
+
+        let requirements = JSON.parse(localStorage.getItem('fathima_requirements')) || initialRequirements;
+        let currentFilter = 'all';
+        let chartInstance = null;
+        let simulationInterval = null;
+
+        // Initialize App
+        document.addEventListener('DOMContentLoaded', () => {
+            initChart();
+            updateDashboard();
+        });
+
+        // Save to LocalStorage
+        function saveData() {
+            localStorage.setItem('fathima_requirements', JSON.stringify(requirements));
+        }
+
+        // Initialize Chart.js Pie/Donut Chart
+        function initChart() {
+            const ctx = document.getElementById('requirementPieChart').getContext('2d');
+            
+            chartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Completed', 'In Progress', 'Pending', 'Deferred'],
+                    datasets: [{
+                        data: [0, 0, 0, 0],
+                        backgroundColor: [
+                            '#10b981', // Emerald
+                            '#3b82f6', // Blue
+                            '#f59e0b', // Amber
+                            '#ef4444'  // Red
+                        ],
+                        borderColor: '#090d16',
+                        borderWidth: 3,
+                        hoverOffset: 12,
+                        hoverBorderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+                    animation: {
+                        animateScale: true,
+                        animateRotate: true,
+                        duration: 800
+                    },
+                    plugins: {
+                        legend: {
+                            display: false // We use custom styled HTML legend
+                        },
+                        tooltip: {
+                            backgroundColor: '#1f2937',
+                            titleColor: '#f9fafb',
+                            bodyColor: '#9ca3af',
+                            borderColor: 'rgba(255,255,255,0.1)',
+                            borderWidth: 1,
+                            padding: 12,
+                            boxPadding: 6,
+                            usePointStyle: true,
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.raw || 0;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
+                                    return ` ${context.label}: ${value} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Update Dashboard Statistics & Chart
+        function updateDashboard() {
+            const counts = {
+                Completed: 0,
+                'In Progress': 0,
+                Pending: 0,
+                Deferred: 0
+            };
+
+            requirements.forEach(req => {
+                if (counts[req.status] !== undefined) {
+                    counts[req.status]++;
+                }
+            });
+
+            const total = requirements.length;
+
+            // Update Stat Cards with smooth count animation
+            animateCount('stat-total', total);
+            animateCount('stat-completed', counts.Completed);
+            animateCount('stat-in-progress', counts['In Progress']);
+            animateCount('stat-pending', counts.Pending);
+            animateCount('stat-deferred', counts.Deferred);
+
+            document.getElementById('chart-total-badge').textContent = `${total} Items`;
+
+            // Calculate & Update Percentages
+            const pCompleted = total ? Math.round((counts.Completed / total) * 100) : 0;
+            const pInProgress = total ? Math.round((counts['In Progress'] / total) * 100) : 0;
+            const pPending = total ? Math.round((counts.Pending / total) * 100) : 0;
+            const pDeferred = total ? Math.round((counts.Deferred / total) * 100) : 0;
+
+            document.getElementById('legend-pct-completed').textContent = `${pCompleted}%`;
+            document.getElementById('legend-pct-in-progress').textContent = `${pInProgress}%`;
+            document.getElementById('legend-pct-pending').textContent = `${pPending}%`;
+            document.getElementById('legend-pct-deferred').textContent = `${pDeferred}%`;
+
+            // Update Live Pie Chart Data
+            if (chartInstance) {
+                chartInstance.data.datasets[0].data = [
+                    counts.Completed,
+                    counts['In Progress'],
+                    counts.Pending,
+                    counts.Deferred
+                ];
+                chartInstance.update();
+            }
+
+            renderRequirementsList();
+            saveData();
+        }
+
+        // Animate counter values
+        function animateCount(elementId, targetValue) {
+            const el = document.getElementById(elementId);
+            const startValue = parseInt(el.textContent) || 0;
+            if (startValue === targetValue) return;
+
+            let current = startValue;
+            const step = targetValue > startValue ? 1 : -1;
+            const timer = setInterval(() => {
+                current += step;
+                el.textContent = current;
+                if (current === targetValue) {
+                    clearInterval(timer);
+                }
+            }, 30);
+        }
+
+        // Render List of Requirements
+        function renderRequirementsList() {
+            const listEl = document.getElementById('requirementsList');
+            const searchVal = document.getElementById('searchInput').value.toLowerCase();
+
+            const filtered = requirements.filter(req => {
+                const matchesFilter = currentFilter === 'all' || req.status === currentFilter;
+                const matchesSearch = req.title.toLowerCase().includes(searchVal) || req.category.toLowerCase().includes(searchVal);
+                return matchesFilter && matchesSearch;
+            });
+
+            if (filtered.length === 0) {
+                listEl.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fa-solid fa-folder-open"></i>
+                        <p>No requirements match your current filter/search.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            listEl.innerHTML = filtered.map(req => {
+                const statusClass = req.status.toLowerCase().replace(' ', '-');
+                const priorityClass = `tag-priority-${req.priority.toLowerCase()}`;
+
+                return `
+                    <div class="req-card">
+                        <div class="req-details">
+                            <div class="req-title">
+                                ${escapeHtml(req.title)}
+                            </div>
+                            <div class="req-meta">
+                                <span class="tag tag-category">${escapeHtml(req.category)}</span>
+                                <span class="tag ${priorityClass}">${req.priority}</span>
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <select class="status-select ${statusClass}" onchange="updateStatus(${req.id}, this.value)">
+                                <option value="Pending" ${req.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                                <option value="In Progress" ${req.status === 'In Progress' ? 'selected' : ''}>In Progress</option>
+                                <option value="Completed" ${req.status === 'Completed' ? 'selected' : ''}>Completed</option>
+                                <option value="Deferred" ${req.status === 'Deferred' ? 'selected' : ''}>Deferred</option>
+                            </select>
+                            <button class="btn-icon-delete" title="Delete Requirement" onclick="deleteRequirement(${req.id})">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Quick update status
+        function updateStatus(id, newStatus) {
+            const req = requirements.find(r => r.id === id);
+            if (req && req.status !== newStatus) {
+                const oldStatus = req.status;
+                req.status = newStatus;
+                updateDashboard();
+                showToast(`Updated "${req.title}" status to <strong>${newStatus}</strong>`);
+            }
+        }
+
+        // Add new requirement
+        function handleAddRequirement(e) {
+            e.preventDefault();
+            const title = document.getElementById('reqTitle').value.trim();
+            const category = document.getElementById('reqCategory').value;
+            const priority = document.getElementById('reqPriority').value;
+            const status = document.getElementById('reqStatus').value;
+
+            if (!title) return;
+
+            const newReq = {
+                id: Date.now(),
+                title: title,
+                category: category,
+                priority: priority,
+                status: status
+            };
+
+            requirements.unshift(newReq);
+            updateDashboard();
+
+            document.getElementById('reqTitle').value = '';
+            toggleAddForm();
+            showToast(`Added new requirement: <strong>${title}</strong>`);
+        }
+
+        // Delete requirement
+        function deleteRequirement(id) {
+            const index = requirements.findIndex(r => r.id === id);
+            if (index !== -1) {
+                const removedTitle = requirements[index].title;
+                requirements.splice(index, 1);
+                updateDashboard();
+                showToast(`Deleted requirement: "${removedTitle}"`);
+            }
+        }
+
+        // Filter Tab Handler
+        function setFilter(filter, tabEl) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+            tabEl.classList.add('active');
+            renderRequirementsList();
+        }
+
+        // Toggle Form Visibility
+        function toggleAddForm() {
+            const formContainer = document.getElementById('add-form-container');
+            const isHidden = formContainer.style.display === 'none';
+            formContainer.style.display = isHidden ? 'block' : 'none';
+            if (isHidden) {
+                document.getElementById('reqTitle').focus();
+            }
+        }
+
+        // Reset to sample data
+        function resetToSampleData() {
+            if (confirm('Reset requirement data back to default demo set?')) {
+                requirements = JSON.parse(JSON.stringify(initialRequirements));
+                updateDashboard();
+                showToast('Reset data to initial demonstration set.');
+            }
+        }
+
+        // Auto Simulate Live Updations Toggle
+        function toggleSimulation() {
+            const btn = document.getElementById('btn-toggle-simulation');
+            
+            if (simulationInterval) {
+                clearInterval(simulationInterval);
+                simulationInterval = null;
+                btn.classList.remove('active');
+                btn.innerHTML = '<i class="fa-solid fa-play"></i> Auto Simulate Live Updates';
+                showToast('Live simulation stopped.');
+            } else {
+                btn.classList.add('active');
+                btn.innerHTML = '<i class="fa-solid fa-square"></i> Stop Live Simulation';
+                showToast('Live simulation started! Requirements will update automatically every 2.5 seconds.');
+
+                const statuses = ['Pending', 'In Progress', 'Completed', 'Deferred'];
+                simulationInterval = setInterval(() => {
+                    if (requirements.length === 0) return;
+                    
+                    // Pick a random requirement
+                    const randomIndex = Math.floor(Math.random() * requirements.length);
+                    const targetReq = requirements[randomIndex];
+
+                    // Move status to next progression
+                    let nextStatus;
+                    if (targetReq.status === 'Pending') nextStatus = 'In Progress';
+                    else if (targetReq.status === 'In Progress') nextStatus = 'Completed';
+                    else if (targetReq.status === 'Completed') nextStatus = 'Deferred';
+                    else nextStatus = 'Pending';
+
+                    targetReq.status = nextStatus;
+                    updateDashboard();
+                    showToast(`⚡ [Live Update] "${targetReq.title}" is now <strong>${nextStatus}</strong>`);
+                }, 2500);
+            }
+        }
+
+        // Toast notifications helper
+        function showToast(message) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `<i class="fa-solid fa-bell" style="color:#818cf8;"></i> <span>${message}</span>`;
+            
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                toast.style.transition = 'all 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Security helper to escape HTML
+        function escapeHtml(str) {
+            return str.replace(/&/g, "&amp;")
+                      .replace(/</g, "&lt;")
+                      .replace(/>/g, "&gt;")
+                      .replace(/"/g, "&quot;")
+                      .replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+</html>
