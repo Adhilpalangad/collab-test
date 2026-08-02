@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Git Collaboration Dashboard</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #311042 100%);
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-hover-bg: rgba(255, 255, 255, 0.07);
+            --glass-hover-border: rgba(255, 255, 255, 0.15);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-glow: rgba(99, 102, 241, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Decorative Background Orbs */
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: 0;
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .orb-1 {
+            width: 300px;
+            height: 300px;
+            background: #6366f1;
+            top: 10%;
+            left: 15%;
+            animation: float 8s ease-in-out infinite alternate;
+        }
+
+        .orb-2 {
+            width: 400px;
+            height: 400px;
+            background: #d946ef;
+            bottom: 10%;
+            right: 15%;
+            animation: float 12s ease-in-out infinite alternate-reverse;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0) scale(1); }
+            100% { transform: translateY(20px) scale(1.05); }
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            width: 90%;
+            max-width: 900px;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        header {
+            margin-bottom: 50px;
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 12px;
+            background: linear-gradient(to right, #ffffff, #c084fc, #6366f1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p.subtitle {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            font-weight: 300;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Dashboard Grid */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        /* Member Card / Button */
+        .member-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 30px 20px;
+            text-decoration: none;
+            color: var(--text-primary);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .member-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, rgba(255,255,255,0.08) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .member-card:hover {
+            transform: translateY(-5px);
+            background: var(--glass-hover-bg);
+            border-color: var(--glass-hover-border);
+            box-shadow: 0 10px 40px var(--accent-glow);
+        }
+
+        .member-card:hover::before {
+            opacity: 1;
+        }
+
+        .avatar-placeholder {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(217, 70, 239, 0.2) 100%);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #c084fc;
+            transition: all 0.4s ease;
+        }
+
+        .member-card:hover .avatar-placeholder {
+            transform: scale(1.1);
+            border-color: rgba(192, 132, 252, 0.5);
+            box-shadow: 0 0 15px rgba(192, 132, 252, 0.3);
+        }
+
+        .member-name {
+            font-size: 1.3rem;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+        }
+
+        .status-badge {
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        .member-card:hover .status-badge {
+            background: rgba(99, 102, 241, 0.2);
+            color: #a5b4fc;
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+
+        /* Footer info */
+        footer {
+            margin-top: 60px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+
+    <div class="container">
+        <header>
+            <h1>Git Collaboration Space</h1>
+            <p class="subtitle">Select a team member's card to visit their personal workspace. Built for team learning and collaboration.</p>
+        </header>
+
+        <div class="grid">
+            <!-- Adhil -->
+            <a href="adhil.html" class="member-card">
+                <div class="avatar-placeholder">Ad</div>
+                <div class="member-name">Adhil</div>
+                <span class="status-badge">View Profile</span>
+            </a>
+
+            <!-- Advika -->
+            <a href="advika.html" class="member-card">
+                <div class="avatar-placeholder">Av</div>
+                <div class="member-name">Advika</div>
+                <span class="status-badge">View Profile</span>
+            </a>
+
+            <!-- Alinshan -->
+            <a href="alinshan.html" class="member-card">
+                <div class="avatar-placeholder">Al</div>
+                <div class="member-name">Alinshan</div>
+                <span class="status-badge">View Profile</span>
+            </a>
+
+            <!-- Adithyan -->
+            <a href="adithyan.html" class="member-card">
+                <div class="avatar-placeholder">At</div>
+                <div class="member-name">Adithyan</div>
+                <span class="status-badge">View Profile</span>
+            </a>
+
+            <!-- Fathima -->
+            <a href="fathima.html" class="member-card">
+                <div class="avatar-placeholder">Fa</div>
+                <div class="member-name">Fathima</div>
+                <span class="status-badge">View Profile</span>
+            </a>
+
+            <!-- Hari -->
+            <a href="hari.html" class="member-card">
+                <div class="avatar-placeholder">Ha</div>
+                <div class="member-name">Hari</div>
+                <span class="status-badge">View Profile</span>
+            </a>
+        </div>
+
+        <footer>
+            <p>Git Collaboration Study Project &bull; Local Development Workspace</p>
+        </footer>
+    </div>
+</body>
+</html>
